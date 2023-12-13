@@ -1,6 +1,8 @@
 const express = require("express");
 const { createServer } = require("node:http");
 
+const userRoutes = require("./routes/userRoutes");
+
 const cors = require("cors");
 const mongoose = require("mongoose");
 require("dotenv").config();
@@ -11,6 +13,9 @@ const server = createServer(app);
 
 app.use(cors());
 app.use(express.json());
+
+//Routes
+app.use("/api/auth", userRoutes);
 
 // DB connection to mongodb
 mongoose
