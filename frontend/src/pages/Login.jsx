@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
@@ -16,11 +16,35 @@ function Login() {
     username: "",
     password: "",
   });
+
+  useEffect(() => {
+    if (localStorage.getItem("chat-app-user")) {
+      navigate("/");
+    }
+  }, [navigate]);
+
+  //handle Change
+  const handleChange = (e) => {
+    setValues({ ...values, [e.target.name]: e.target.value });
+  };
+
+  const handleValidation = () => {
+    const { username, password } = values;
+    if (username === "") {
+      toast.error("USERNAME is required", toastOptions);
+      return false;
+    } else if (password === "") {
+      toast.error("PASSWORD is required", toastOptions);
+      return false;
+    }
+    return true;
+  };
+
   //handle Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (handleValidation()) {
-      const { password, username } = values;
+      const { username, password } = values;
       const { data } = await axios.post(loginRoute, {
         username,
         password,
@@ -30,14 +54,9 @@ function Login() {
       }
       if (data.status === true) {
         localStorage.setItem("chat-app-user", JSON.stringify(data.user));
+        navigate("/");
       }
-      navigate("/");
     }
-  };
-
-  //handle Change
-  const handleChange = (e) => {
-    setValues({ ...values, [e.target.name]: e.target.value });
   };
 
   const toastOptions = {
@@ -48,17 +67,6 @@ function Login() {
     theme: "dark",
   };
 
-  const handleValidation = () => {
-    const { password, username } = values;
-    if (password === "") {
-      toast.error("PASSWORD is required", toastOptions);
-      return false;
-    } else if (username.length === "") {
-      toast.error("USERNAME is required", toastOptions);
-      return false;
-    }
-    return true;
-  };
   return (
     <>
       <FormContainer>
